@@ -119,8 +119,8 @@ class DS1307():
 		
 if __name__ == "__main__": 
 	clock = DS1307()
-	clock.fillByYMD(2014,11,27)
-	clock.fillByHMS(17,42,30)
+	clock.fillByYMD(2015,3,5)
+	clock.fillByHMS(12,42,30)
 	clock.fillDayOfWeek(clock.THU)	
 	clock.setTime()
 	while True:		

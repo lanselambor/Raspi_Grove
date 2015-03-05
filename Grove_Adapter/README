@@ -1,0 +1,6 @@
+Description of the projects
+1.Grove_RTC
+  this module use i2c bus, because the Wiringpi didn't provide i2c block_read or block_write methods so I use the RPi.GPIO library
+
+2.Grove_4_Digital_Display
+
