@@ -1,0 +1,7 @@
+
+the i2c API is so poor in wiringpi, there is no APIs like Wire.requestfrom().
+<<<<<<< HEAD
+So that neither requestfrom nor write_i2c_block_data() can't be called
+=======
+So that neither requestfrom nor write_i2c_block_data() can't be call.
+>>>>>>> 737256f08766911dad6d87186fcf23f8ae1b0c44
