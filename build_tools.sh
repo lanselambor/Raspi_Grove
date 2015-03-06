@@ -1,6 +1,6 @@
 
 apt-get update
-sudo apt-get upgrade
+#sudo apt-get upgrade
 
 install tools
 apt-get install python-pip
