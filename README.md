@@ -5,7 +5,7 @@ step 1:Install neccessary tools by typing the cmd_line
 
   $sudo ./build_tools.sh
 
-step2:Clone the WiringPi2-Python repository 
+step2:Clone the WiringPi2-Python repository and follow its user guid
 
   $git clone https://github.com/WiringPi/WiringPi2-Python
 
