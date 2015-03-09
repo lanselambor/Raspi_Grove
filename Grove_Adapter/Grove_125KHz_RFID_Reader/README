@@ -1,0 +1,8 @@
+Description:
+    The readout data has changed to ASCII and like below, in this project we read out the RFID data by tow times.
+
+$[MainThread: ]
+$readout:   8 5 0 0 A 1 2
+$readout:  9 6 9 6 4
+
+the original data is "8500A1296964"
