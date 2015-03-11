@@ -58,7 +58,7 @@ class Fingerprint():
         packet = [FINGERPRINT_VERIFYPASSWORD, (self.thePassword >> 24), (self.thePassword >> 16),(self.thePassword >> 8), self.thePassword]
         #writePacket(theAddress, FINGERPRINT_COMMANDPACKET, 7, packet)
         len = getReply(packet)
-        if ((len == 1) && (packet[0] == FINGERPRINT_ACKPACKET) && (packet[1] == FINGERPRINT_OK)):
+        if len == 1 and packet[0] == FINGERPRINT_ACKPACKET and packet[1] == FINGERPRINT_OK:
             return True
         return false
 '''        

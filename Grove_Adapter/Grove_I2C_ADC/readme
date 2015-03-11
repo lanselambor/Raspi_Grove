@@ -1,0 +1,3 @@
+This demo is for I2C_ADC and Moisture Sensor
+result:
+  print the percentage value of moistrue

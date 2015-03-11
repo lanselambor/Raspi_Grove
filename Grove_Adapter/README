@@ -3,4 +3,20 @@ Description of the projects
   this module use i2c bus, because the Wiringpi didn't provide i2c block_read or block_write methods so I use the RPi.GPIO library
 
 2.Grove_4_Digital_Display
+   no complete
+
+3.125KHz_RFID
+  complete
+
+4.Dust Sensor
+  data no correct
+
+5.Moisture Sensor
+analog input Raspi cann't deal with it
+
+6.Temperature&Humidity Sensor
+Can't deal with this module for python language runtime speed.
+
+7.I2C_ADC
+Complete
 

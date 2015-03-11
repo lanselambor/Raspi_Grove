@@ -1,0 +1,3 @@
+This project can't complete for the language work time of python,
+the test indicated that one word runtime of python can't take about 10us around.
+Because DHT has the comunicattion speed of class 1us, so python can't deal with it
