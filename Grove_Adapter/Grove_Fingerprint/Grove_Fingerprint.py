@@ -2,7 +2,7 @@
 
 import wiringpi2
 import time
-
+import sys
 
 
 wiringpi2.wiringPiSetup()
@@ -51,100 +51,103 @@ class Fingerprint():
         self.FINGERPRINT_VERIFYPASSWORD = 0x13
         self.FINGERPRINT_HISPEEDSEARCH = 0x1B
         self.FINGERPRINT_TEMPLATECOUNT = 0x1D
+        self.DEFAULTTIMEOUT = 5000
 
         self.thePassword = 0
         self.theAddress = 0xffffffff
-
+        self.fingerID, self.confidence, self.templateCount = 0, 0, 0
+        
         self.fd = wiringpi2.serialOpen('/dev/ttyAMA0', 57600)
         
 
     def verifyPassword(self):
         packet = [self.FINGERPRINT_VERIFYPASSWORD, (self.thePassword >> 24), (self.thePassword >> 16),(self.thePassword >> 8), self.thePassword]
-        writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, 7, packet)
-        len = getReply(packet)
-        if len == 1 and packet[0] == self.FINGERPRINT_ACKPACKET and packet[1] == self.FINGERPRINT_OK:
+        self.writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, 7, packet)
+        print 'send packet done.'
+        length = self.getReply(packet, self.DEFAULTTIMEOUT)
+        if length == 1 and packet[0] == self.FINGERPRINT_ACKPACKET and packet[1] == self.FINGERPRINT_OK:
             return True
-        return false
+        return False
 
-    def getImage(self):
-        packet = [FINGERPRINT_GETIMAGE]
-        writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, 3, packet)
-        len = getReply(packet)
-        if len != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
+    def getImage(self):        
+        packet = [self.FINGERPRINT_GETIMAGE, 0]
+        self.writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, 3, packet)
+        length = self.getReply(packet, self.DEFAULTTIMEOUT)
+        if length != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
             return -1
         return packet[1]
         
     def image2Tz(self, slot):
         packet = [self.FINGERPRINT_IMAGE2TZ, slot]
-        writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, sizeof(packet)+2, packet)
-        len = getReply(packet)
-        if len != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
+        self.writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, len(packet)+2, packet)
+        length = self.getReply(packet, self.DEFAULTTIMEOUT)
+        if length != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
             return -1
         return packet[1]
         
     def createModel(self):
         packet = [self.FINGERPRINT_REGMODEL]
-        writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, sizeof(packet)+2, packet)
-        len = getReply(packet)
-        if len != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
+        self.writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, len(packet)+2, packet)
+        length = self.getReply(packet, self.DEFAULTTIMEOUT)
+        if length != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
             return -1
         return packet[1]
         
     def storeModel(self, id):
         packet = [self.FINGERPRINT_STORE, 0x01, id >> 8, id & 0xFF]
-        writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, sizeof(packet)+2, packet)
-        len = getReply(packet)
-        if len != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
+        self.writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, len(packet)+2, packet)
+        length = self.getReply(packet, self.DEFAULTTIMEOUT)
+        if length != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
             return -1
         return packet[1]
         
     def deleteModel(self, id):
         packet = [self.FINGERPRINT_DELETE, id >> 8, id & 0xFF, 0x00, 0x01]
-        writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, sizeof(packet)+2, packet)
-        len = getReply(packet)
-        if len != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
+        self.writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, len(packet)+2, packet)
+        length = self.getReply(packet, self.DEFAULTTIMEOUT)
+        if length != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
             return -1
         return packet[1]
         
     def emptyDatabase(self):
         packet = [self.FINGERPRINT_EMPTY]
-        writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, sizeof(packet)+2, packet)
-        len = getReply(packet)
-        if len != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
+        self.writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, len(packet)+2, packet)
+        length = self.getReply(packet, self.DEFAULTTIMEOUT)
+        if length != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
             return -1
         return packet[1]
         
     def fingerFastSearch(self):
-        fingerID = 0xFFFF
-        confidence = 0xFFFF
+        self.fingerID = 0xFFFF
+        self.confidence = 0xFFFF
         # high speed search of slot #1 starting at page 0x0000 and page #0x00A3 
         packet = [self.FINGERPRINT_HISPEEDSEARCH, 0x01, 0x00, 0x00, 0x00, 0xA3]
-        writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, sizeof(packet)+2, packet)
-        len = getReply(packet)
-        if len != 1  and packet[0] != self.FINGERPRINT_ACKPACKET:
+        self.writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, len(packet)+2, packet)
+        length = self.getReply(packet, self.DEFAULTTIMEOUT)
+        if length != 1  and packet[0] != self.FINGERPRINT_ACKPACKET:
             return -1
-        fingerID = packet[2]
-        fingerID <<= 8
-        fingerID |= packet[3]
-        confidence = packet[4]
-        confidence <<= 8
-        confidence |= packet[5]
+        self.fingerID = packet[2]
+        self.fingerID <<= 8
+        self.fingerID |= packet[3]
+        self.confidence = packet[4]
+        self.confidence <<= 8
+        self.confidence |= packet[5]
         return packet[1]
 
     def getTemplateCount(self):
-        templateCount = 0xFFFF
+        self.templateCount = 0xFFFF
         # get number of templates in memory
         packet = {self.FINGERPRINT_TEMPLATECOUNT}
-        writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, sizeof(packet)+2, packet)
-        len = getReply(packet)
-        if len != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
+        self.writePacket(self.theAddress, self.FINGERPRINT_COMMANDPACKET, len(packet)+2, packet)
+        length = self.getReply(packet, self.DEFAULTTIMEOUT)
+        if length != 1 and packet[0] != self.FINGERPRINT_ACKPACKET:
             return -1
-        templateCount = packet[2]
-        templateCount <<= 8
-        templateCount |= packet[3]
+        self.templateCount = packet[2]
+        self.templateCount <<= 8
+        self.templateCount |= packet[3]
         return packet[1]
 
-    def writePacket(self, addr, packettype, len, packet):
+    def writePacket(self, addr, packettype, length, packet):
         wiringpi2.serialPutchar(self.fd, self.FINGERPRINT_STARTCODE >> 8)
         wiringpi2.serialPutchar(self.fd, self.FINGERPRINT_STARTCODE & 0xff)
         wiringpi2.serialPutchar(self.fd, ( addr >> 24 ) & 0xFF )
@@ -152,55 +155,60 @@ class Fingerprint():
         wiringpi2.serialPutchar(self.fd, ( addr >> 8 ) & 0xFf )
         wiringpi2.serialPutchar(self.fd, addr & 0xFF )
         wiringpi2.serialPutchar(self.fd, packettype )
-        wiringpi2.serialPutchar(self.fd, len >> 8 )
-        wiringpi2.serialPutchar(self.fd, len )
+        wiringpi2.serialPutchar(self.fd, length >> 8 )
+        wiringpi2.serialPutchar(self.fd, length )
         sum = 0x000
-        sum = (len>>8) + (len&0xFF) + packettype
+        sum = (length>>8) + (length&0xFF) + packettype
 
-        for i in range(0, len - 2):
+        for i in range(0, length - 2):
             wiringpi2.serialPutchar(self.fd, packet[i] )
             sum += packet[i]
         wiringpi2.serialPutchar(self.fd, sum>>8 )
         wiringpi2.serialPutchar(self.fd, sum )
 
-    def getReply(self):
-        reply = [0x00 for i in range(20)]
+    def getReply(self, packet, timeout):
+        reply = [0x00 for x in xrange(20)]
         idx = 0x00
-        timer = 0x0000         
+        timer = 0         
         while True:
-            while  0 == wiringpi2.serialDataAvail():
+            while  0 >= wiringpi2.serialDataAvail(self.fd):
                 wiringpi2.delay(1)
                 timer += 1
                 if(timer >= timeout):
+                    print 'timeout.'
                     return self.FINGERPRINT_TIMEOUT
-                # something to read!
-                reply[idx] = wiringpi2.serialGetchar(self.fd)
-                if ((idx == 0) and (reply[0] != (self.FINGERPRINT_STARTCODE >> 8))):
-                    continue
-                idx += 1
-                # check packet!
-                if idx >= 9:
-                    if ((reply[0] != (self.FINGERPRINT_STARTCODE >> 8)) or (reply[1] != (self.FINGERPRINT_STARTCODE & 0xFF))):
-                        return self.FINGERPRINT_BADPACKET
-                    packettype = reply[6]
-                    len = reply[7]
-                    len <<= 8
-                    len |= reply[8]
-                    len -= 2
-                    # Serial.print("Packet len"); Serial.println(len);
-                    if idx <= (len+10):
-                        continue
-                    packet[0] = packettype
-                    for i in range(0, len):
-                        packet[1+i] = reply[9+i]
-                    return len
+                   
+	    # something to read!
+	    reply[idx] = wiringpi2.serialGetchar(self.fd)
+	    if idx == 0 and reply[0] != self.FINGERPRINT_STARTCODE >> 8:
+		continue
+	    idx += 1
+	    # check packet!
+	    if idx >= 9:
+		if reply[0] != self.FINGERPRINT_STARTCODE >> 8 or reply[1] != self.FINGERPRINT_STARTCODE & 0xFF:
+		    return self.FINGERPRINT_BADPACKET
+		packettype = reply[6]
+		length = reply[7]
+		length <<= 8
+		length |= reply[8]
+		length -= 2
+		print"Packet length", length
+		if idx <= length + 10:
+		    continue
+		packet[0] = packettype
+		for i in range(length):
+		    packet[1+i] = reply[9+i]
+		return length
 
 if __name__=="__main__":
     print 'start'
     fp = Fingerprint()
-    p = [0x33, 0x44]
     while True:
-        fp.writePacket(0x11111111, 0x02, 0x02, p)
+        if 0 != fp.verifyPassword():
+            print 'Found device'
+        else:
+            print 'Device not found'
+            sys.exit(0)
         wiringpi2.serialPutchar(fp.fd, 0x00 )
         time.sleep(1) 
         
