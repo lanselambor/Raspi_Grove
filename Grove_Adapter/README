@@ -12,11 +12,13 @@ Description of the projects
   data no correct
 
 5.Moisture Sensor
-analog input Raspi cann't deal with it
+  analog input Raspi cann't deal with it
 
 6.Temperature&Humidity Sensor
-Can't deal with this module for python language runtime speed.
+  Can't deal with this module for python language runtime speed.
 
 7.I2C_ADC
-Complete
+  Done
 
+8.I2C_Motor_Driver
+  Done
