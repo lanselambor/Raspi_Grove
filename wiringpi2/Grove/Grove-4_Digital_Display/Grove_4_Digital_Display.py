@@ -4,6 +4,9 @@ import sys
 
 wiringpi2.wiringPiSetup()
 
+#OW = 0
+
+
 class TM1637():
     def __init__(self, Clk, Data):
 	self.TubeTab = [0x3f,0x06,0x5b,0x4f,\
@@ -61,14 +64,32 @@ class TM1637():
     def start(self):
         wiringpi2.digitalWrite(self.Clkpin, 1)
         wiringpi2.digitalWrite(self.Datapin, 1)
-        wiringpi2.digitalWrite(self.Datapin, 0)
         wiringpi2.digitalWrite(self.Clkpin, 0)
+        wiringpi2.digitalWrite(self.Datapin, 0)
 
     def stop(self):
         wiringpi2.digitalWrite(self.Clkpin, 0)
         wiringpi2.digitalWrite(self.Datapin, 0)
         wiringpi2.digitalWrite(self.Clkpin, 1)
         wiringpi2.digitalWrite(self.Datapin, 1)
+
+#    def display(self, DispData):
+#        #print 'display'
+#        SegData = [0, 0, 0, 0]
+#        for i in range(0, 4):
+#           SegData[i] = DispData[i]
+#        self.coding(SegData)
+#        self.start()
+#        self.writeByte(ADDR_AUTO)
+#        self.stop()
+#        self.start()
+#        self.writeByte(self.Cmd_SetAddr)
+#        for i in range(0, 4):
+#            self.writeByte(SegData[i])
+#        self.stop()
+#        self.start()
+#        self.writeByte(self.Cmd_DispCtrl)
+#        self.stop()
 
     def display(self, BitAddr, DispData):
         SegData = self.coding(DispData)
@@ -97,6 +118,18 @@ class TM1637():
     def point(self, PointFlag):
         self._PointFlag = PointFlag
 
+#    def coding(self, DispData):
+#        #print 'coding'
+#        PointData = 0
+#        if(self._PointFlag == POINT_ON):
+#            PointData = 0x80
+#        else:
+#            PointData = 0
+#        for i in range(0, 4):
+#            if(DispData[i] == 0x7f):
+#                PointData[i] = 0x00
+#                DispData[i] = TubeTab[DispData[i]] + PointData
+
     def coding(self, DispData):
         if self._PointFlag == self.POINT_ON:
             PointData = 0x80
@@ -113,10 +146,7 @@ if __name__ == "__main__":
     tm1637.clearDisplay()
     tm1637.set(tm1637.BRIGHT_TYPICAL, 0x40, 0xc0)
     while True:
-        for i in range(16):
+        for i in range(10):
             time.sleep(1)
             tm1637.display(0,i)
-            tm1637.display(1,i)
-            tm1637.display(2,i)
-            tm1637.display(3,i)
             
